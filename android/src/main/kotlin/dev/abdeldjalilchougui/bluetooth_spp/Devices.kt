@@ -34,10 +34,11 @@ internal object Devices {
             intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
         }
 
-    /** Registers a receiver for system Bluetooth broadcasts. */
+    /** Registers a receiver for Bluetooth broadcasts (see [ReceiverFlags]). */
     fun register(context: Context, receiver: BroadcastReceiver, filter: IntentFilter) {
-        if (Build.VERSION.SDK_INT >= 33) {
-            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        val flags = ReceiverFlags.forBluetoothBroadcasts(Build.VERSION.SDK_INT)
+        if (flags != null) {
+            context.registerReceiver(receiver, filter, flags)
         } else {
             context.registerReceiver(receiver, filter)
         }
