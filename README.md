@@ -240,10 +240,22 @@ listeners.
   future Android versions.
 - No background service. Connections live as long as the Flutter engine; they are closed when it
   detaches.
-- **Not yet tested on a real device.** The Dart API is tested with mocked method and event
-  channels. The Kotlin logic (UUID parsing, error mapping, connection registry, chunked write
-  queue, read loop, connect plan, permission policy) is JUnit-tested without a socket. The code
-  that touches the Android Bluetooth stack compiles but has not been run against hardware.
+- The Dart API is tested with mocked method and event channels, and the Kotlin logic (UUID
+  parsing, error mapping, connection registry, chunked write queue, read loop, connect plan,
+  permission policy, receiver flags) with JUnit.
+- The example app has an emulator integration test (`example/integration_test/`, run with
+  `dart run tool/run_on_device.dart <applicationId>` from `example/`) against the emulator's
+  virtual Bluetooth controller. It checks `permissionsStatus` with and without
+  `BLUETOOTH_CONNECT` / `BLUETOOTH_SCAN`, `adapterState` (off, turning on, on), `isEnabled`,
+  `requestEnable` while on, `bondedDevices`, the typed errors (disabled, permission, invalid
+  address), `connect` to an address with no device (`SppTimeoutException` or
+  `SppConnectException` within the timeout, with every fallback), `bond` to it (returns false),
+  and a discovery that ends after about 12 seconds.
+- **Not tested: a real SPP link.** The emulator has no Bluetooth Classic device to talk to, so
+  a successful connect, reading, writing, a remote disconnect, a successful bond, `removeBond`,
+  and the `requestEnable` dialog were not exercised. Discovery found no devices.
+
+**Tested on:** Android Emulator, Pixel 10 image, API 37 (physical phone not tested).
 
 ## License
 
